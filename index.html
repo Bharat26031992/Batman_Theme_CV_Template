@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>// Bharat Singh Rawat // Dossier #26031992</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Special+Elite&family=Playfair+Display:ital,wght@0,700;1,700&family=Jolly+Lodger&family=VT323&display=swap" rel="stylesheet">
+    
+    <script>
+        window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --bat-yellow: #ffcc00;
+            --noir-black: #050507;
+            --joker-purple: #9d00ff;
+            --riddler-green: #39ff14;
+            --freeze-blue: #00d4ff;
+            --ivy-green: #2ecc71;
+            --curtain-red: #6a0000;
+            /* Fixed Torch Variables */
+            --cursor-x: 50vw;
+            --cursor-y: 50vh;
+            --torch-radius: 800px;
+            --torch-darkness: 0.98;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--noir-black);
+            color: #cfcfcf;
+            font-family: 'Special Elite', monospace;
+            overflow-x: hidden;
+            cursor: none;
+            scroll-behavior: auto; 
+        }
+
+        /* --- THE DETECTIVE TORCH LAYER --- */
+        #torch-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none; 
+            z-index: 8000; 
+            background: radial-gradient(circle var(--torch-radius) at var(--cursor-x) var(--cursor-y), rgba(0,0,0,0) 0%, rgba(0,0,0,calc(var(--torch-darkness) - 0.28)) 30%, rgba(0,0,0,var(--torch-darkness)) 100%);
+        }
+
+        /* --- THE HUD CROSSHAIR --- */
+        #hud { 
+            position: fixed; width: 60px; height: 60px; z-index: 10000000; 
+            pointer-events: none; transform: translate(-50%, -50%); 
+            filter: drop-shadow(0 0 10px #ffffff) drop-shadow(0 0 5px var(--bat-yellow)); 
+        }
+        .ret { position: absolute; width: 15px; height: 15px; border: 3px solid #fff; }
+        .tl { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+        .tr { top: 0; right: 0; border-left: 0; border-bottom: 0; }
+        .bl { bottom: 0; left: 0; border-right: 0; border-top: 0; }
+        .br { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+
+        /* --- THE BATMAN --- */
+        #batman-fixed { position: fixed; top: 20px; right: 20px; width: 160px; z-index: 10000; pointer-events: none; }
+        #batman-img { width: 100%; filter: drop-shadow(0 0 15px rgba(0,0,0,0.9)); }
+
+        /* --- BACKGROUND ENGINE --- */
+        #gotham-bg { position: fixed; inset: 0; z-index: -2; pointer-events: none; overflow: hidden; background: #000; }
+        .rain { position: absolute; width: 1px; height: 80px; background: rgba(255,255,255,0.15); top: -100px; }
+        #skyline { 
+            position: absolute; bottom: 0; left: 0; width: 300%; height: 500px;
+            background: linear-gradient(transparent, #000), url("https://i.imgur.com/G4ABy9p.png") repeat-x;
+            background-size: contain; opacity: 0.2;
+        }
+
+        /* --- JOKER THEATER CURTAINS & SURPRISE --- */
+        .curtain {
+            position: fixed; top: 0; height: 100vh; width: 52vw; z-index: 999998;
+            background: repeating-linear-gradient(to right, #4a0000, var(--curtain-red) 20px, #3a0000 40px);
+            box-shadow: inset 0 0 50px #000; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); pointer-events: none;
+        }
+        #curtain-left { left: 0; transform: translateX(-100%); border-right: 8px solid var(--bat-yellow); }
+        #curtain-right { right: 0; transform: translateX(100%); border-left: 8px solid var(--bat-yellow); }
+        .curtain.closed-left { transform: translateX(0); }
+        .curtain.closed-right { transform: translateX(0); }
+
+        /* OVERPOWERS THE TORCH WITH HIGH Z-INDEX & BRIGHT COLORS */
+        #joker-bottom-surprise {
+            position: fixed; inset: 0; z-index: 9999999; /* Sits above EVERYTHING including torch */
+            background: url('joker-laugh2.gif') center/600px no-repeat;;
+            display: none; pointer-events: none;
+            filter: contrast(150%) brightness(130%) saturate(200%); /* Bright & Scary */
+        }
+
+        /* Jumpscare Pop & Fade animation */
+        .jump-scare-anim { animation: pop-fade 2s forwards; }
+        @keyframes pop-fade {
+            0% { transform: scale(0.5); opacity: 0; filter: contrast(300%) brightness(200%); }
+            10% { transform: scale(1.1); opacity: 1; filter: contrast(150%) brightness(130%) saturate(200%); }
+            15% { transform: scale(1.0); }
+            80% { opacity: 1; transform: scale(1.05); }
+            100% { opacity: 0; transform: scale(1.2); }
+        }
+
+        /* --- INTRO OVERLAYS --- */
+        #pre-boot {
+            position: fixed; inset: 0; background: #000; z-index: 99999999;
+            display: flex; justify-content: center; align-items: center; cursor: none;
+        }
+        #pre-boot h1 { font-family: 'VT323'; color: var(--bat-yellow); font-size: 3rem; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+        #intro-overlay {
+            position: fixed; inset: 0; background: #050507; z-index: 999999;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 1s ease;
+        }
+        .joker-trigger {
+            width: 60px; height: 40px; background: var(--bat-yellow); 
+            clip-path: polygon(0% 50%, 20% 0%, 50% 30%, 80% 0%, 100% 50%, 80% 100%, 50% 70%, 20% 100%);
+            margin-bottom: 30px; cursor: none; opacity: 0.3; transition: 0.3s;
+        }
+        .joker-trigger:hover { opacity: 1; filter: drop-shadow(0 0 20px var(--joker-purple)); }
+        #joker-scare { position: fixed; inset: 0; z-index: 1000000; background: url('joker-laugh.gif') center/cover; display: none; }
+
+        /* --- CONTENT CARDS --- */
+        .container { max-width: 1000px; margin: 0 auto; padding: 120px 20px; position: relative; z-index: 5; }
+        .card { 
+            background: rgba(15, 15, 18, 0.95); border-left: 8px solid var(--bat-yellow); 
+            padding: 50px; margin-bottom: 100px; box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+            position: relative; transition: 0.3s;
+        }
+
+        h1 { font-family: 'Bebas Neue', sans-serif; font-size: 6rem; color: var(--bat-yellow); margin: 0; line-height: 0.85; }
+        .m-title { font-family: 'Bebas Neue'; background: var(--bat-yellow); color: #000; padding: 10px 30px; display: inline-block; transform: skewX(-15deg); font-size: 2.5rem; margin-bottom: 35px; }
+        
+        .sub-role { color: #fff; font-weight: bold; font-size: 1.6rem; display: block; margin-top: 30px; border-bottom: 2px solid #555; width: fit-content; padding-bottom: 5px; }
+        .date-tag { color: #888; font-size: 1.2rem; display: block; margin-bottom: 15px; margin-top: 5px;}
+        
+        ul { list-style: none; padding: 0; margin-top: 15px; }
+        li { margin-bottom: 15px; font-size: 1.4rem; line-height: 1.5; color: #ddd; }
+        li::before { content: "➤ "; color: var(--bat-yellow); }
+
+        .btn-lab { background: transparent; border: 2px solid var(--bat-yellow); color: var(--bat-yellow); padding: 10px 25px; cursor: none; font-family: 'Bebas Neue'; font-size: 1.5rem; text-decoration: none; display: inline-block; transition: 0.3s; }
+        .btn-lab:hover { background: var(--bat-yellow); color: #000; box-shadow: 0 0 15px var(--bat-yellow); }
+
+        /* --- SECTION SPECIFIC STYLES & INTERACTIVE FX --- */
+        
+        /* I. Joker */
+        .j-style { font-family: 'Jolly Lodger', cursive; font-size: 2.2rem; }
+        .j-style .sub-role { border-color: var(--joker-purple); color: var(--joker-purple); }
+        .j-style li::before { color: var(--joker-purple); }
+
+        /* II. Riddler */
+        .r-style { font-family: 'VT323', monospace; color: var(--riddler-green); font-size: 1.7rem; }
+        .r-style .sub-role { border-color: var(--riddler-green); color: #fff; }
+        .r-style li::before { color: var(--riddler-green); content: "? "; }
+
+        /* III. Mr. Freeze */
+        .a-style li {
+            position: relative; overflow: hidden; font-family: 'Bebas Neue'; font-size: 1.8rem; color: var(--freeze-blue);
+            margin-bottom: 15px; padding: 15px; border: 1px solid rgba(0, 212, 255, 0.2); background: rgba(0, 30, 50, 0.3);
+            border-left: 1px solid rgba(0, 212, 255, 0.2) !important; transition: all 0.3s ease;
+        }
+        .a-style li::before { display: none; }
+        .freeze-fx {
+            color: #fff !important; text-shadow: 0 0 5px #00d4ff, 0 0 15px #fff, 0 0 30px #00d4ff !important;
+            letter-spacing: 2px; transform: scale(1.02); background: rgba(0, 212, 255, 0.5) !important;
+            border-left: 5px solid #fff !important; box-shadow: 0 0 20px rgba(0,212,255,0.4);
+        }
+
+        /* IV. Poison Ivy */
+        .i-style { font-family: 'Playfair Display', serif; color: var(--ivy-green); font-style: italic; font-size: 1.5rem; }
+        .ivy-target { transition: all 0.5s ease-in-out; border: 1px solid transparent; }
+        .ivy-fx {
+            color: #39ff14 !important; text-shadow: 0 0 10px #2ecc71, 0 0 20px #2ecc71 !important;
+            transform: scale(1.05) rotate(-1deg); border-color: #39ff14 !important;
+            background: rgba(46, 204, 113, 0.2) !important; box-shadow: 0 0 15px rgba(46, 204, 113, 0.3);
+        }
+        
+        #loop-msg { 
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            color: var(--curtain-red); font-family: 'Jolly Lodger'; font-size: 2.5rem; letter-spacing: 5px; opacity: 0.8; z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="batman-theme" src="theme.mp3" loop preload="auto"></audio>
+    <audio id="bg-ambient" src="ambient-noir.mp3" loop preload="auto"></audio>
+    <audio id="snd-joker" src="joker-laugh.mp3"></audio>
+    <audio id="snd-joker-cut" src="joker-cut.mp3"></audio>
+
+    <div id="joker-scare"></div>
+    <div id="joker-bottom-surprise"></div>
+    
+    <div id="curtain-left" class="curtain"></div>
+    <div id="curtain-right" class="curtain"></div>
+
+    <div id="pre-boot" onclick="bootTerminal()" onmouseenter="hoverSound('base')">
+        <h1>[ ESTABLISH SECURE CONNECTION ]</h1>
+    </div>
+
+    <div id="intro-overlay">
+        <div class="joker-trigger" onclick="scare()" onmouseenter="hoverSound('joker')"></div>
+        <h1 style="font-size:8rem;">RAWAT ENTERPRISES</h1>
+        <p style="letter-spacing: 15px; color: var(--bat-yellow); margin-top: 20px; font-family: 'VT323'; font-size: 1.5rem;">SUBJECT: RAWAT, B.S. // CLASSIFIED ACCESS</p>
+        <button onclick="initSystem()" onmouseenter="hoverSound('base')" style="background:transparent; color:red; border:3px solid red; padding:20px 60px; font-size:2.5rem; cursor:none; margin-top:50px; font-family:'Bebas Neue'; letter-spacing: 5px; transition:0.3s;">ENTER THE BATCAVE</button>
+    </div>
+
+    <div id="gotham-bg"><div id="skyline"></div></div>
+    <div id="torch-layer"></div>
+
+    <div id="hud">
+        <div class="ret tl"></div><div class="ret tr"></div>
+        <div class="ret bl"></div><div class="ret br"></div>
+    </div>
+
+    <div id="batman-fixed"><img src="Batman.png" id="batman-img" alt="Batman"></div>
+
+    <div class="container">
+        
+        <section class="card base-target">
+            <span style="color:var(--bat-yellow); font-weight:bold; letter-spacing:5px;">[ CLASSIFIED DOCUMENTS]</span>
+            <h1>BHARAT SINGH RAWAT, Ph.D.</h1>
+            <h3 style="color: #888; margin-top: 15px; font-size: 2rem;">// ION SOURCE & BEAM DIAGNOSTICS EXPERT</h3>
+            <p style="color:#ccc; font-size: 1.6rem; margin-top: 25px;">Expert in manipulating charged particle beams with 7+ years of experience in ion sources, beam extraction/transport systems and digital twins.</p>
+            <div style="margin-top: 40px;">
+                <a href="https://bharat26031992.github.io/AEgIS_Outreach_Game/" target="_blank" class="btn-lab">OP: DIGITAL TWIN GAME</a>
+                <a href="https://bharat26031992.github.io/Project-Hbar/" target="_blank" class="btn-lab" style="margin-left: 20px; border-color: red; color: red;">OP: PROJECT HBAR</a>
+            </div>
+        </section>
+
+        <h2 class="m-title">I. SERVICE RECORD</h2>
+        <div class="card j-style">
+            <span class="sub-role">Research Associate | University of Liverpool / Cockcroft Institute / CERN</span>
+            <span class="date-tag">2023 — 2026</span>
+            <ul class="joker-list">
+                <li>Led ballistic antiproton transport optimization utilizing 3D CST Penning Trap models.</li>
+                <li>Creating a Digital Twin of the Penning Malmberg trap apparatus, integrating first principles physics with Machine Learning (ML) models to predict trap behavior and optimize particle confinement.</li>
+                <li>Executing critical on-shift responsibilities during beam time, including real-time data acquisition and the management of cryogenic systems for superconducting magnets.</li>
+            </ul>
+
+            <span class="sub-role">Radiation Protection Engineer | Nuvia India Pvt Limited</span>
+            <span class="date-tag">2018 — 2018</span>
+            <ul class="joker-list">
+                <li>Managed occupational radiation exposure at Kakrapar Atomic Power Station.</li>
+                <li>Developed automated dose tracking systems for proactive safety interventions.</li>
+                <li>Coordinated with the Health Physics and Reactor Management teams to provide real-time notification of dose status.</li>
+            </ul>
+        </div>
+
+        <h2 class="m-title" style="background: var(--riddler-green);">II. SCIENTIFIC CLEARANCE</h2>
+        <div class="card r-style">
+            <span class="sub-role">Ph.D. | Homi Bhabha National Institute / Institute for Plasma Research</span>
+            <span class="date-tag">2018 — 2024</span>
+            <ul class="riddler-list">
+                <li>Designed a ring cusp ion source for $\text{Ar}^+$ beams ($1$ to $2\text{ keV}$, $100\text{ mA}$).</li>
+                <li>Utilized CST Studio for magnetic cusp optimization and OPERA-3D for ion optics design, achieving a low beam divergence of $\sim 6.5^\circ$.</li>
+                <li>Conducted transient thermo-structural analysis in ANSYS to design a grid mounting system that limited thermal deformation to $< 0.1\text{ mm}$.</li>
+                <li>Engineered a nine-channel Parallel Wire Array (PWA) and a Faraday Cup array (FCA) for real-time monitoring of ion beam profiles.</li>
+            </ul>
+
+            <span class="sub-role">M.Tech. Nuclear Engineering | Pandit Deendayal Petroleum University</span>
+            <span class="date-tag">2015 — 2017</span>
+            <ul class="riddler-list">
+                <li>Developed a $10\text{ kW}$ Faraday cup capable of measuring $20$ to $30\text{ mA}$ beam intensities.</li>
+                <li>Designed cooling systems maintaining copper Faraday Cup at $350.6^\circ\text{C}$ for thermal integrity.</li>
+                <li>Calculated suppression voltages ($-450\text{V}$ to $-500\text{V}$) via SIMION 8.0 and LORENTZ.</li>
+            </ul>
+        </div>
+
+        <h2 class="m-title" style="background: var(--freeze-blue); color: #000;">III. RESTRICTED ARCHIVES (PUBLICATIONS)</h2>
+        <div class="card a-style">
+            <ul class="freeze-list">
+                <li>Instruments (2026): Characterization of the extraction system of supersonic gas curtain-based ionization profile monitor for flash proton therapy.</li>
+                <li>IBIC (2025): Design studies of a Retarding Potential Energy Analyser (RPEA) for low energy antimatter experiments.</li>
+                <li>Instruments (2025): Faraday cups: principles, designs, and applications across scientific disciplines—a review.</li>
+                <li>EXA-LEAP (2025): 3D simulation studies of mixed plasma confinement at AEgIS.</li>
+                <li>Phys. Rev. Lett. (2024): Positronium Laser Cooling via the $1^3\text{S-}2^3\text{P}$ Transition with a Broadband Laser Pulse.</li>
+                <li>IPAC (2024): Simulation studies for the confinement of antiprotons for the AEgIS experiment.</li>
+                <li>IEEE TPS (2023): Experimental Studies on the Roles of Space Charge Neutralization in a Ring Cusp Ion Source.</li>
+                <li>AIP Advances (2022): Measurement system for ion beam profiles using fixed parallel wires and Faraday cup array.</li>
+                <li>IEEE TPS (2021): Characterization of a Multicusp Ion Source with Two-Grid Extraction System.</li>
+                <li>ICONE25 (2017): Design and simulation of $10\text{ kW}$ Faraday cup for ion beam current.</li>
+            </ul>
+        </div>
+
+        <h2 class="m-title" style="background: var(--ivy-green);">IV. SUBJECT INTEL</h2>
+        <div class="card i-style">
+            <p class="ivy-target" style="font-family: 'Special Elite', monospace; color: #fff; padding: 10px;"><strong>SOFTWARE STACK:</strong> CST Studio, OPERA3D, SIMION, COMSOL, RF Track, ANSYS, ASTRA, MAD-X, Geant4, IBISIMU.</p>
+            <div style="display:flex; gap: 20px; flex-wrap: wrap; margin-top: 30px;">
+                <div class="ivy-target" style="padding: 15px; border: 1px solid var(--ivy-green); background: rgba(0,255,100,0.05);">♟ CHESS: 1900 ELO (EXPERT)</div>
+                <div class="ivy-target" style="padding: 15px; border: 1px solid var(--ivy-green); background: rgba(0,255,100,0.05);">🌍 5 LANGUAGES (ES, EN, GU, RU, HI)</div>
+                <div class="ivy-target" style="padding: 15px; border: 1px solid var(--ivy-green); background: rgba(0,255,100,0.05);">🎵 KEYTAR & GUITAR</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loop-msg">HAHAHAHA! THE SHOW MUST GO ON!</div>
+
+    <script>
+        // --- DYNAMIC TORCH ENGINE (Fixed 500px base with dynamic movement) ---
+        const hud = document.getElementById('hud');
+        let torchSize = 500;
+        let targetTorchSize = 500;
+        let lastX = window.innerWidth / 2;
+        let lastY = window.innerHeight / 2;
+        let baseRadius = 500;
+        
+        document.addEventListener('mousemove', (e) => {
+            // Move HUD Crosshair
+            hud.style.left = e.clientX + 'px';
+            hud.style.top = e.clientY + 'px';
+            
+            // Calculate Mouse Velocity
+            let dx = e.clientX - lastX;
+            let dy = e.clientY - lastY;
+            let velocity = Math.sqrt(dx*dx + dy*dy);
+            lastX = e.clientX;
+            lastY = e.clientY;
+
+            // Faster movement narrows the beam slightly, but keeps base at 500
+            targetTorchSize = Math.max(300, baseRadius - velocity * 1.5);
+            
+            // Set Position
+            document.documentElement.style.setProperty('--cursor-x', e.clientX + 'px');
+            document.documentElement.style.setProperty('--cursor-y', e.clientY + 'px');
+        });
+
+        // Smoothly interpolate torch size & add realistic flicker
+        setInterval(() => {
+            torchSize += (targetTorchSize - torchSize) * 0.1;
+            let flicker = torchSize + (Math.random() * 8 - 4); 
+            document.documentElement.style.setProperty('--torch-radius', flicker + 'px');
+        }, 30);
+
+
+        // --- PRE-BOOT: Unlocks Audio Context ---
+        function bootTerminal() {
+            hoverSound('base');
+            document.getElementById('pre-boot').style.display = 'none';
+            document.getElementById('intro-overlay').style.display = 'flex';
+            
+            // Start Batman Theme
+            const theme = document.getElementById('batman-theme');
+            theme.volume = 0.5;
+            theme.play().catch(e => console.log("Audio boot error."));
+        }
+
+
+        // --- SYSTEM INITIALIZATION (DECRYPT DOSSIER) ---
+        function initSystem() {
+            hoverSound('base'); 
+            const overlay = document.getElementById('intro-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => { overlay.style.display = 'none'; }, 1000);
+            
+            // Fade out Batman Theme
+            const theme = document.getElementById('batman-theme');
+            let vol = theme.volume;
+            let fadeOut = setInterval(() => {
+                if (vol > 0.05) { vol -= 0.05; theme.volume = vol; }
+                else { clearInterval(fadeOut); theme.pause(); }
+            }, 100);
+
+            // Fade in Noir Ambient
+            const ambient = document.getElementById('bg-ambient');
+            ambient.volume = 0;
+            ambient.play().catch(e => console.log("Audio blocked."));
+            let fadeIn = setInterval(() => {
+                if (ambient.volume < 0.010) { ambient.volume += 0.05; }
+                else { clearInterval(fadeIn); }
+            }, 100);
+
+            startBackgroundEffects();
+            initInteractiveEffects(); 
+        }
+
+        // --- THE JOKER SHOWTIME TRANSITION & JUMP SCARE ---
+        let isTransitioning = false;
+        window.onscroll = function() {
+            document.getElementById('skyline').style.transform = `translateX(-${window.pageYOffset * 0.2}px)`;
+
+            if (!isTransitioning && (window.innerHeight + Math.ceil(window.pageYOffset)) >= document.body.offsetHeight - 5) {
+                triggerShowtime();
+            }
+        };
+
+        function triggerShowtime() {
+            isTransitioning = true;
+            
+            // 1. Play sounds (New Joker Cut MP3 & Theatrical Chord)
+            playTheatricalChord();
+            const jokerCut = document.getElementById('snd-joker-cut');
+            if(jokerCut) { jokerCut.currentTime = 0; jokerCut.play().catch(e => {}); }
+
+            // 2. Show the New Joker Surprise instantly with bright colors & pop-in fade
+            const surprise = document.getElementById('joker-bottom-surprise');
+            surprise.style.display = 'block';
+            surprise.classList.add('jump-scare-anim');
+
+            // 3. Pull the curtains closed over the fading surprise
+            setTimeout(() => {
+                document.getElementById('curtain-left').classList.add('closed-left');
+                document.getElementById('curtain-right').classList.add('closed-right');
+            }, 5000); // Wait 1.2s to let the user get properly scared
+
+            // 4. Teleport and Reset
+            setTimeout(() => {
+                window.scrollTo(0, 0); 
+                setTimeout(() => {
+                    document.getElementById('curtain-left').classList.remove('closed-left');
+                    document.getElementById('curtain-right').classList.remove('closed-right');
+                    surprise.style.display = 'none';
+                    surprise.classList.remove('jump-scare-anim');
+                    isTransitioning = false;
+                }, 600); 
+            }, 1900); // 1200 + 700 to let curtains fully close before teleporting
+        }
+
+        // --- VILLAIN INTERACTIVE EFFECTS ENGINE ---
+        function initInteractiveEffects() {
+            // 1. JOKER
+            document.querySelectorAll('.joker-list li').forEach(li => {
+                let text = li.innerHTML;
+                let words = text.split(' ');
+                li.innerHTML = '';
+                words.forEach(w => {
+                    let span = document.createElement('span');
+                    span.innerHTML = w + ' ';
+                    span.style.display = 'inline-block';
+                    li.appendChild(span);
+                });
+
+                li.addEventListener('mouseenter', () => {
+                    if (li.isAnimating) return;
+                    li.isAnimating = true;
+                    hoverSound('joker');
+                    
+                    let spans = li.querySelectorAll('span');
+                    spans.forEach(span => {
+                        span.style.transition = 'none';
+                        let rx = (Math.random() - 0.5) * 400;
+                        let ry = (Math.random() - 0.5) * 400;
+                        let rrot = (Math.random() - 0.5) * 360;
+                        span.style.transform = `translate(${rx}px, ${ry}px) rotate(${rrot}deg)`;
+                        span.style.opacity = '0';
+                    });
+
+                    setTimeout(() => {
+                        spans.forEach(span => {
+                            span.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s';
+                            span.style.transform = 'translate(0, 0) rotate(0deg)';
+                            span.style.opacity = '1';
+                        });
+                    }, 50);
+
+                    setTimeout(() => { li.isAnimating = false; }, 600);
+                });
+            });
+
+            // 2. RIDDLER
+            document.querySelectorAll('.riddler-list li').forEach(li => {
+                li.addEventListener('mouseenter', function() {
+                    if (this.isTyping) return;
+                    this.isTyping = true;
+                    hoverSound('riddler');
+                    
+                    this.style.transition = 'none';
+                    this.style.clipPath = 'polygon(0 0, 0 0, 0 100%, 0 100%)';
+                    this.style.color = '#39ff14'; 
+                    this.style.textShadow = '0 0 10px #39ff14';
+                    
+                    setTimeout(() => {
+                        this.style.transition = 'clip-path 1.2s steps(40)';
+                        this.style.clipPath = 'polygon(0 0, 100% 0, 100% 100%, 0 100%)';
+                    }, 50);
+                    
+                    setTimeout(() => { 
+                        this.isTyping = false; 
+                        this.style.transition = 'none';
+                        this.style.color = ''; 
+                        this.style.textShadow = '';
+                    }, 1300);
+                });
+            });
+
+            // 3. MR. FREEZE
+            document.querySelectorAll('.freeze-list li').forEach(li => {
+                li.addEventListener('mouseenter', () => {
+                    hoverSound('freeze');
+                    li.classList.add('freeze-fx');
+                });
+                li.addEventListener('mouseleave', () => li.classList.remove('freeze-fx'));
+            });
+
+            // 4. POISON IVY
+            document.querySelectorAll('.ivy-target').forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    hoverSound('ivy');
+                    el.classList.add('ivy-fx');
+                });
+                el.addEventListener('mouseleave', () => el.classList.remove('ivy-fx'));
+            });
+
+            // Base UI sounds
+            document.querySelectorAll('.base-target, .btn-lab').forEach(el => {
+                el.addEventListener('mouseenter', () => hoverSound('base'));
+            });
+        }
+
+        // --- SYNTHESIZED AUDIO ENGINE ---
+        function hoverSound(villain) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                const now = ctx.currentTime;
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                if (villain === 'joker') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.exponentialRampToValueAtTime(1200, now + 0.3);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now); osc.stop(now + 0.3);
+                } else if (villain === 'riddler') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.setValueAtTime(900, now + 0.05);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now); osc.stop(now + 0.1);
+                } else if (villain === 'freeze') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(3000, now);
+                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.2);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now); osc.stop(now + 0.2);
+                } else if (villain === 'ivy') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(60, now);
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.15, now + 0.2);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.4);
+                    osc.start(now); osc.stop(now + 0.4);
+                } else {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(50, now + 0.05);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now); osc.stop(now + 0.05);
+                }
+            } catch(e) {}
+        }
+
+        function playTheatricalChord() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = ctx.currentTime;
+                [300, 350, 400, 450].forEach(freq => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.05, now + 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 1.5);
+                });
+            } catch(e) {}
+        }
+
+        // Joker Trigger Button (Start Menu)
+        function scare() {
+            const s = document.getElementById('joker-scare');
+            const snd = document.getElementById('snd-joker');
+            if(snd) { snd.currentTime = 0; snd.play().catch(e => {}); }
+            s.style.display = 'block';
+            setTimeout(() => s.style.display = 'none', 2500);
+        }
+
+        // Rain Generation
+        function startBackgroundEffects() {
+            const bg = document.getElementById('gotham-bg');
+            for(let i=0; i<70; i++) {
+                const r = document.createElement('div');
+                r.className = 'rain';
+                r.style.left = Math.random() * 100 + '%';
+                r.style.top = Math.random() * 100 + '%';
+                bg.appendChild(r);
+                animateRain(r);
+            }
+        }
+
+        function animateRain(el) {
+            let speed = 2 + Math.random() * 3;
+            function step() {
+                let top = parseFloat(el.style.top);
+                el.style.top = (top > 105 ? -10 : top + speed) + '%';
+                requestAnimationFrame(step);
+            }
+            step();
+        }
+    </script>
+</body>
+</html>
