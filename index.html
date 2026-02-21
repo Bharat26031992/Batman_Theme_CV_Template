@@ -2,15 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>// Bharat Singh Rawat // Dossier #26031992</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Special+Elite&family=Playfair+Display:ital,wght@0,700;1,700&family=Jolly+Lodger&family=VT323&display=swap" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     
     <script>
         window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Special+Elite&family=Playfair+Display:ital,wght@0,700;1,700&family=Jolly+Lodger&family=VT323&display=swap" rel="stylesheet">
+    
+    <script src="parallax.js" defer></script>
+    <script src="jukebox.js" defer></script>
 
     <style>
         :root {
@@ -30,12 +35,13 @@
 
         body, html {
             margin: 0; padding: 0;
-            background-color: var(--noir-black);
+            background-color: transparent; /* FIXED: Made transparent so background shows */
             color: #cfcfcf;
             font-family: 'Special Elite', monospace;
             overflow-x: hidden;
             cursor: none;
             scroll-behavior: auto; 
+            touch-action: pan-y;
         }
 
         /* --- THE DETECTIVE TORCH LAYER --- */
@@ -45,6 +51,7 @@
             pointer-events: none; 
             z-index: 8000; 
             background: radial-gradient(circle var(--torch-radius) at var(--cursor-x) var(--cursor-y), rgba(0,0,0,0) 0%, rgba(0,0,0,calc(var(--torch-darkness) - 0.28)) 30%, rgba(0,0,0,var(--torch-darkness)) 100%);
+            transition: background 0.05s linear; 
         }
 
         /* --- THE HUD CROSSHAIR --- */
@@ -64,13 +71,7 @@
         #batman-img { width: 100%; filter: drop-shadow(0 0 15px rgba(0,0,0,0.9)); }
 
         /* --- BACKGROUND ENGINE --- */
-        #gotham-bg { position: fixed; inset: 0; z-index: -2; pointer-events: none; overflow: hidden; background: #000; }
-        .rain { position: absolute; width: 1px; height: 80px; background: rgba(255,255,255,0.15); top: -100px; }
-        #skyline { 
-            position: absolute; bottom: 0; left: 0; width: 300%; height: 500px;
-            background: linear-gradient(transparent, #000), url("https://i.imgur.com/G4ABy9p.png") repeat-x;
-            background-size: contain; opacity: 0.2;
-        }
+        #gotham-bg { position: fixed; inset: 0; z-index: -2; pointer-events: none; overflow: hidden; background-color: var(--noir-black); }
 
         /* --- JOKER THEATER CURTAINS & SURPRISE --- */
         .curtain {
@@ -83,15 +84,13 @@
         .curtain.closed-left { transform: translateX(0); }
         .curtain.closed-right { transform: translateX(0); }
 
-        /* OVERPOWERS THE TORCH WITH HIGH Z-INDEX & BRIGHT COLORS */
         #joker-bottom-surprise {
-            position: fixed; inset: 0; z-index: 9999999; /* Sits above EVERYTHING including torch */
-            background: url('joker-laugh2.gif') center/600px no-repeat;;
+            position: fixed; inset: 0; z-index: 9999999; 
+            background: url('joker-laugh2.gif') center/600px no-repeat;
             display: none; pointer-events: none;
-            filter: contrast(150%) brightness(130%) saturate(200%); /* Bright & Scary */
+            filter: contrast(150%) brightness(130%) saturate(200%); 
         }
 
-        /* Jumpscare Pop & Fade animation */
         .jump-scare-anim { animation: pop-fade 2s forwards; }
         @keyframes pop-fade {
             0% { transform: scale(0.5); opacity: 0; filter: contrast(300%) brightness(200%); }
@@ -106,7 +105,7 @@
             position: fixed; inset: 0; background: #000; z-index: 99999999;
             display: flex; justify-content: center; align-items: center; cursor: none;
         }
-        #pre-boot h1 { font-family: 'VT323'; color: var(--bat-yellow); font-size: 3rem; animation: pulse 2s infinite; }
+        #pre-boot h1 { font-family: 'VT323'; color: var(--bat-yellow); font-size: 3rem; animation: pulse 2s infinite; text-align: center; padding: 20px; }
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
         #intro-overlay {
@@ -117,9 +116,10 @@
         .joker-trigger {
             width: 60px; height: 40px; background: var(--bat-yellow); 
             clip-path: polygon(0% 50%, 20% 0%, 50% 30%, 80% 0%, 100% 50%, 80% 100%, 50% 70%, 20% 100%);
-            margin-bottom: 30px; cursor: none; opacity: 0.3; transition: 0.3s;
+            margin-bottom: 30px; opacity: 0.3; transition: 0.3s;
         }
-        .joker-trigger:hover { opacity: 1; filter: drop-shadow(0 0 20px var(--joker-purple)); }
+        @media (hover: hover) and (pointer: fine) { .joker-trigger:hover { opacity: 1; filter: drop-shadow(0 0 20px var(--joker-purple)); cursor: pointer; } }
+
         #joker-scare { position: fixed; inset: 0; z-index: 1000000; background: url('joker-laugh.gif') center/cover; display: none; }
 
         /* --- CONTENT CARDS --- */
@@ -140,22 +140,18 @@
         li { margin-bottom: 15px; font-size: 1.4rem; line-height: 1.5; color: #ddd; }
         li::before { content: "➤ "; color: var(--bat-yellow); }
 
-        .btn-lab { background: transparent; border: 2px solid var(--bat-yellow); color: var(--bat-yellow); padding: 10px 25px; cursor: none; font-family: 'Bebas Neue'; font-size: 1.5rem; text-decoration: none; display: inline-block; transition: 0.3s; }
+        .btn-lab { background: transparent; border: 2px solid var(--bat-yellow); color: var(--bat-yellow); padding: 10px 25px; cursor: pointer; font-family: 'Bebas Neue'; font-size: 1.5rem; text-decoration: none; display: inline-block; transition: 0.3s; }
         .btn-lab:hover { background: var(--bat-yellow); color: #000; box-shadow: 0 0 15px var(--bat-yellow); }
 
         /* --- SECTION SPECIFIC STYLES & INTERACTIVE FX --- */
-        
-        /* I. Joker */
         .j-style { font-family: 'Jolly Lodger', cursive; font-size: 2.2rem; }
         .j-style .sub-role { border-color: var(--joker-purple); color: var(--joker-purple); }
         .j-style li::before { color: var(--joker-purple); }
 
-        /* II. Riddler */
         .r-style { font-family: 'VT323', monospace; color: var(--riddler-green); font-size: 1.7rem; }
         .r-style .sub-role { border-color: var(--riddler-green); color: #fff; }
         .r-style li::before { color: var(--riddler-green); content: "? "; }
 
-        /* III. Mr. Freeze */
         .a-style li {
             position: relative; overflow: hidden; font-family: 'Bebas Neue'; font-size: 1.8rem; color: var(--freeze-blue);
             margin-bottom: 15px; padding: 15px; border: 1px solid rgba(0, 212, 255, 0.2); background: rgba(0, 30, 50, 0.3);
@@ -168,7 +164,6 @@
             border-left: 5px solid #fff !important; box-shadow: 0 0 20px rgba(0,212,255,0.4);
         }
 
-        /* IV. Poison Ivy */
         .i-style { font-family: 'Playfair Display', serif; color: var(--ivy-green); font-style: italic; font-size: 1.5rem; }
         .ivy-target { transition: all 0.5s ease-in-out; border: 1px solid transparent; }
         .ivy-fx {
@@ -178,8 +173,37 @@
         }
         
         #loop-msg { 
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; text-align: center;
             color: var(--curtain-red); font-family: 'Jolly Lodger'; font-size: 2.5rem; letter-spacing: 5px; opacity: 0.8; z-index: 1000;
+        }
+
+        /* --- MOBILE RESPONSIVE CSS --- */
+        @media (max-width: 850px) {
+            #hud { display: none; } 
+            #batman-fixed { width: 100px; top: 10px; right: 10px; opacity: 0.8; }
+            .container { padding: 80px 15px; }
+            .card { padding: 30px 20px; margin-bottom: 60px; border-left-width: 4px; }
+            
+            h1 { font-size: 3.5rem; }
+            .m-title { font-size: 1.8rem; margin-bottom: 25px; padding: 8px 15px; }
+            .sub-role { font-size: 1.3rem; }
+            .date-tag { font-size: 1.1rem; }
+            li { font-size: 1.15rem; margin-bottom: 12px; }
+            .j-style { font-size: 1.8rem; }
+            .r-style { font-size: 1.4rem; }
+            .a-style li { font-size: 1.4rem; padding: 10px; }
+            .i-style { font-size: 1.2rem; }
+            
+            #pre-boot h1 { font-size: 2.2rem; }
+            #intro-overlay h1 { font-size: 4rem !important; text-align: center; line-height: 0.9; margin: 0 10px; }
+            #intro-overlay button { font-size: 1.8rem !important; padding: 15px 30px !important; letter-spacing: 2px !important; }
+            #intro-overlay p { font-size: 1rem !important; text-align: center; letter-spacing: 5px !important; }
+            #joker-bottom-surprise { background-size: contain; }
+            :root { --torch-radius: 600px; }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            body, html, .btn-lab, #intro-overlay button, .joker-trigger { cursor: auto !important; }
         }
     </style>
 </head>
@@ -196,18 +220,18 @@
     <div id="curtain-left" class="curtain"></div>
     <div id="curtain-right" class="curtain"></div>
 
-    <div id="pre-boot" onclick="bootTerminal()" onmouseenter="hoverSound('base')">
+    <div id="pre-boot" onclick="bootTerminal()">
         <h1>[ ESTABLISH SECURE CONNECTION ]</h1>
     </div>
 
     <div id="intro-overlay">
-        <div class="joker-trigger" onclick="scare()" onmouseenter="hoverSound('joker')"></div>
+        <div class="joker-trigger" onclick="scare()"></div>
         <h1 style="font-size:8rem;">RAWAT ENTERPRISES</h1>
         <p style="letter-spacing: 15px; color: var(--bat-yellow); margin-top: 20px; font-family: 'VT323'; font-size: 1.5rem;">SUBJECT: RAWAT, B.S. // CLASSIFIED ACCESS</p>
-        <button onclick="initSystem()" onmouseenter="hoverSound('base')" style="background:transparent; color:red; border:3px solid red; padding:20px 60px; font-size:2.5rem; cursor:none; margin-top:50px; font-family:'Bebas Neue'; letter-spacing: 5px; transition:0.3s;">ENTER THE BATCAVE</button>
+        <button onclick="initSystem()" style="background:transparent; color:red; border:3px solid red; padding:20px 60px; font-size:2.5rem; cursor:pointer; margin-top:50px; font-family:'Bebas Neue'; letter-spacing: 5px; transition:0.3s;">ENTER THE BATCAVE</button>
     </div>
 
-    <div id="gotham-bg"><div id="skyline"></div></div>
+    <div id="gotham-bg"></div>
     <div id="torch-layer"></div>
 
     <div id="hud">
@@ -220,28 +244,28 @@
     <div class="container">
         
         <section class="card base-target">
-            <span style="color:var(--bat-yellow); font-weight:bold; letter-spacing:5px;">[ CLASSIFIED DOCUMENTS]</span>
+            <span style="color:var(--bat-yellow); font-weight:bold; letter-spacing:5px; font-family: 'VT323';">[ CLASSIFIED DOCUMENTS]</span>
             <h1>BHARAT SINGH RAWAT, Ph.D.</h1>
-            <h3 style="color: #888; margin-top: 15px; font-size: 2rem;">// ION SOURCE & BEAM DIAGNOSTICS EXPERT</h3>
-            <p style="color:#ccc; font-size: 1.6rem; margin-top: 25px;">Expert in manipulating charged particle beams with 7+ years of experience in ion sources, beam extraction/transport systems and digital twins.</p>
-            <div style="margin-top: 40px;">
-                <a href="https://bharat26031992.github.io/AEgIS_Outreach_Game/" target="_blank" class="btn-lab">OP: DIGITAL TWIN GAME</a>
-                <a href="https://bharat26031992.github.io/Project-Hbar/" target="_blank" class="btn-lab" style="margin-left: 20px; border-color: red; color: red;">OP: PROJECT HBAR</a>
+            <h3 style="color: #888; margin-top: 15px; font-size: 2rem; font-family: 'VT323';">// ION SOURCE & BEAM DIAGNOSTICS EXPERT</h3>
+            <p style="color:#ccc; font-size: 1.4rem; margin-top: 25px;">Expert in manipulating charged particle beams with 7+ years of experience in ion sources, beam extraction/transport systems and digital twins.</p>
+            <div style="margin-top: 40px; display: flex; flex-wrap: wrap; gap: 15px;">
+                <a href="https://bharat26031992.github.io/AEgIS_Outreach_Game/" target="_blank" class="btn-lab" style="text-align: center;">OP: DIGITAL TWIN GAME</a>
+                <a href="https://bharat26031992.github.io/Project-Hbar/" target="_blank" class="btn-lab" style="border-color: red; color: red; text-align: center;">OP: PROJECT HBAR</a>
             </div>
         </section>
 
         <h2 class="m-title">I. SERVICE RECORD</h2>
         <div class="card j-style">
-            <span class="sub-role">Research Associate | University of Liverpool / Cockcroft Institute / CERN</span>
-            <span class="date-tag">2023 — 2026</span>
+            <span class="sub-role" style="font-family: 'Special Elite'; font-size: 1.2rem;">Research Associate | University of Liverpool / Cockcroft Institute / CERN</span>
+            <span class="date-tag" style="font-family: 'Special Elite';">2023 — 2026</span>
             <ul class="joker-list">
                 <li>Led ballistic antiproton transport optimization utilizing 3D CST Penning Trap models.</li>
                 <li>Creating a Digital Twin of the Penning Malmberg trap apparatus, integrating first principles physics with Machine Learning (ML) models to predict trap behavior and optimize particle confinement.</li>
                 <li>Executing critical on-shift responsibilities during beam time, including real-time data acquisition and the management of cryogenic systems for superconducting magnets.</li>
             </ul>
 
-            <span class="sub-role">Radiation Protection Engineer | Nuvia India Pvt Limited</span>
-            <span class="date-tag">2018 — 2018</span>
+            <span class="sub-role" style="font-family: 'Special Elite'; font-size: 1.2rem; margin-top: 40px;">Radiation Protection Engineer | Nuvia India Pvt Limited</span>
+            <span class="date-tag" style="font-family: 'Special Elite';">2018 — 2018</span>
             <ul class="joker-list">
                 <li>Managed occupational radiation exposure at Kakrapar Atomic Power Station.</li>
                 <li>Developed automated dose tracking systems for proactive safety interventions.</li>
@@ -260,7 +284,7 @@
                 <li>Engineered a nine-channel Parallel Wire Array (PWA) and a Faraday Cup array (FCA) for real-time monitoring of ion beam profiles.</li>
             </ul>
 
-            <span class="sub-role">M.Tech. Nuclear Engineering | Pandit Deendayal Petroleum University</span>
+            <span class="sub-role" style="margin-top: 40px;">M.Tech. Nuclear Engineering | Pandit Deendayal Petroleum University</span>
             <span class="date-tag">2015 — 2017</span>
             <ul class="riddler-list">
                 <li>Developed a $10\text{ kW}$ Faraday cup capable of measuring $20$ to $30\text{ mA}$ beam intensities.</li>
@@ -299,35 +323,34 @@
     <div id="loop-msg">HAHAHAHA! THE SHOW MUST GO ON!</div>
 
     <script>
-        // --- DYNAMIC TORCH ENGINE (Fixed 500px base with dynamic movement) ---
+        // --- DYNAMIC TORCH ENGINE (Touch + Mouse Support) ---
         const hud = document.getElementById('hud');
         let torchSize = 500;
         let targetTorchSize = 500;
         let lastX = window.innerWidth / 2;
         let lastY = window.innerHeight / 2;
-        let baseRadius = 500;
+        let baseRadius = window.innerWidth < 850 ? 600 : 500; 
         
-        document.addEventListener('mousemove', (e) => {
-            // Move HUD Crosshair
-            hud.style.left = e.clientX + 'px';
-            hud.style.top = e.clientY + 'px';
+        function updateTorch(clientX, clientY) {
+            hud.style.left = clientX + 'px';
+            hud.style.top = clientY + 'px';
             
-            // Calculate Mouse Velocity
-            let dx = e.clientX - lastX;
-            let dy = e.clientY - lastY;
+            let dx = clientX - lastX;
+            let dy = clientY - lastY;
             let velocity = Math.sqrt(dx*dx + dy*dy);
-            lastX = e.clientX;
-            lastY = e.clientY;
+            lastX = clientX;
+            lastY = clientY;
 
-            // Faster movement narrows the beam slightly, but keeps base at 500
             targetTorchSize = Math.max(300, baseRadius - velocity * 1.5);
             
-            // Set Position
-            document.documentElement.style.setProperty('--cursor-x', e.clientX + 'px');
-            document.documentElement.style.setProperty('--cursor-y', e.clientY + 'px');
-        });
+            document.documentElement.style.setProperty('--cursor-x', clientX + 'px');
+            document.documentElement.style.setProperty('--cursor-y', clientY + 'px');
+        }
 
-        // Smoothly interpolate torch size & add realistic flicker
+        document.addEventListener('mousemove', (e) => updateTorch(e.clientX, e.clientY));
+        document.addEventListener('touchmove', (e) => updateTorch(e.touches[0].clientX, e.touches[0].clientY), {passive: true});
+        document.addEventListener('touchstart', (e) => updateTorch(e.touches[0].clientX, e.touches[0].clientY), {passive: true});
+
         setInterval(() => {
             torchSize += (targetTorchSize - torchSize) * 0.1;
             let flicker = torchSize + (Math.random() * 8 - 4); 
@@ -341,7 +364,6 @@
             document.getElementById('pre-boot').style.display = 'none';
             document.getElementById('intro-overlay').style.display = 'flex';
             
-            // Start Batman Theme
             const theme = document.getElementById('batman-theme');
             theme.volume = 0.5;
             theme.play().catch(e => console.log("Audio boot error."));
@@ -355,7 +377,6 @@
             overlay.style.opacity = '0';
             setTimeout(() => { overlay.style.display = 'none'; }, 1000);
             
-            // Fade out Batman Theme
             const theme = document.getElementById('batman-theme');
             let vol = theme.volume;
             let fadeOut = setInterval(() => {
@@ -363,7 +384,6 @@
                 else { clearInterval(fadeOut); theme.pause(); }
             }, 100);
 
-            // Fade in Noir Ambient
             const ambient = document.getElementById('bg-ambient');
             ambient.volume = 0;
             ambient.play().catch(e => console.log("Audio blocked."));
@@ -372,40 +392,33 @@
                 else { clearInterval(fadeIn); }
             }, 100);
 
-            startBackgroundEffects();
             initInteractiveEffects(); 
         }
 
         // --- THE JOKER SHOWTIME TRANSITION & JUMP SCARE ---
         let isTransitioning = false;
-        window.onscroll = function() {
-            document.getElementById('skyline').style.transform = `translateX(-${window.pageYOffset * 0.2}px)`;
-
+        window.addEventListener('scroll', function() {
             if (!isTransitioning && (window.innerHeight + Math.ceil(window.pageYOffset)) >= document.body.offsetHeight - 5) {
                 triggerShowtime();
             }
-        };
+        });
 
         function triggerShowtime() {
             isTransitioning = true;
             
-            // 1. Play sounds (New Joker Cut MP3 & Theatrical Chord)
             playTheatricalChord();
             const jokerCut = document.getElementById('snd-joker-cut');
             if(jokerCut) { jokerCut.currentTime = 0; jokerCut.play().catch(e => {}); }
 
-            // 2. Show the New Joker Surprise instantly with bright colors & pop-in fade
             const surprise = document.getElementById('joker-bottom-surprise');
             surprise.style.display = 'block';
             surprise.classList.add('jump-scare-anim');
 
-            // 3. Pull the curtains closed over the fading surprise
             setTimeout(() => {
                 document.getElementById('curtain-left').classList.add('closed-left');
                 document.getElementById('curtain-right').classList.add('closed-right');
-            }, 5000); // Wait 1.2s to let the user get properly scared
+            }, 5000); 
 
-            // 4. Teleport and Reset
             setTimeout(() => {
                 window.scrollTo(0, 0); 
                 setTimeout(() => {
@@ -415,10 +428,21 @@
                     surprise.classList.remove('jump-scare-anim');
                     isTransitioning = false;
                 }, 600); 
-            }, 1900); // 1200 + 700 to let curtains fully close before teleporting
+            }, 1900); 
         }
 
-        // --- VILLAIN INTERACTIVE EFFECTS ENGINE ---
+        // --- VILLAIN INTERACTIVE EFFECTS ENGINE (Mobile/Touch Supported) ---
+        function addTrigger(elements, callback, mouseleaveCallback) {
+            elements.forEach(el => {
+                el.addEventListener('mouseenter', () => callback(el));
+                el.addEventListener('touchstart', () => callback(el), {passive: true});
+                if(mouseleaveCallback) {
+                    el.addEventListener('mouseleave', () => mouseleaveCallback(el));
+                    el.addEventListener('touchend', () => mouseleaveCallback(el), {passive: true});
+                }
+            });
+        }
+
         function initInteractiveEffects() {
             // 1. JOKER
             document.querySelectorAll('.joker-list li').forEach(li => {
@@ -432,12 +456,12 @@
                     li.appendChild(span);
                 });
 
-                li.addEventListener('mouseenter', () => {
-                    if (li.isAnimating) return;
-                    li.isAnimating = true;
+                const triggerJoker = (element) => {
+                    if (element.isAnimating) return;
+                    element.isAnimating = true;
                     hoverSound('joker');
                     
-                    let spans = li.querySelectorAll('span');
+                    let spans = element.querySelectorAll('span');
                     spans.forEach(span => {
                         span.style.transition = 'none';
                         let rx = (Math.random() - 0.5) * 400;
@@ -455,58 +479,50 @@
                         });
                     }, 50);
 
-                    setTimeout(() => { li.isAnimating = false; }, 600);
-                });
+                    setTimeout(() => { element.isAnimating = false; }, 600);
+                };
+                addTrigger([li], triggerJoker);
             });
 
             // 2. RIDDLER
-            document.querySelectorAll('.riddler-list li').forEach(li => {
-                li.addEventListener('mouseenter', function() {
-                    if (this.isTyping) return;
-                    this.isTyping = true;
-                    hoverSound('riddler');
-                    
-                    this.style.transition = 'none';
-                    this.style.clipPath = 'polygon(0 0, 0 0, 0 100%, 0 100%)';
-                    this.style.color = '#39ff14'; 
-                    this.style.textShadow = '0 0 10px #39ff14';
-                    
-                    setTimeout(() => {
-                        this.style.transition = 'clip-path 1.2s steps(40)';
-                        this.style.clipPath = 'polygon(0 0, 100% 0, 100% 100%, 0 100%)';
-                    }, 50);
-                    
-                    setTimeout(() => { 
-                        this.isTyping = false; 
-                        this.style.transition = 'none';
-                        this.style.color = ''; 
-                        this.style.textShadow = '';
-                    }, 1300);
-                });
-            });
+            const triggerRiddler = (element) => {
+                if (element.isTyping) return;
+                element.isTyping = true;
+                hoverSound('riddler');
+                
+                element.style.transition = 'none';
+                element.style.clipPath = 'polygon(0 0, 0 0, 0 100%, 0 100%)';
+                element.style.color = '#39ff14'; 
+                element.style.textShadow = '0 0 10px #39ff14';
+                
+                setTimeout(() => {
+                    element.style.transition = 'clip-path 1.2s steps(40)';
+                    element.style.clipPath = 'polygon(0 0, 100% 0, 100% 100%, 0 100%)';
+                }, 50);
+                
+                setTimeout(() => { 
+                    element.isTyping = false; 
+                    element.style.transition = 'none';
+                    element.style.color = ''; 
+                    element.style.textShadow = '';
+                }, 1300);
+            };
+            addTrigger(document.querySelectorAll('.riddler-list li'), triggerRiddler);
 
             // 3. MR. FREEZE
-            document.querySelectorAll('.freeze-list li').forEach(li => {
-                li.addEventListener('mouseenter', () => {
-                    hoverSound('freeze');
-                    li.classList.add('freeze-fx');
-                });
-                li.addEventListener('mouseleave', () => li.classList.remove('freeze-fx'));
-            });
+            addTrigger(document.querySelectorAll('.freeze-list li'), 
+                (el) => { hoverSound('freeze'); el.classList.add('freeze-fx'); },
+                (el) => { el.classList.remove('freeze-fx'); }
+            );
 
             // 4. POISON IVY
-            document.querySelectorAll('.ivy-target').forEach(el => {
-                el.addEventListener('mouseenter', () => {
-                    hoverSound('ivy');
-                    el.classList.add('ivy-fx');
-                });
-                el.addEventListener('mouseleave', () => el.classList.remove('ivy-fx'));
-            });
+            addTrigger(document.querySelectorAll('.ivy-target'), 
+                (el) => { hoverSound('ivy'); el.classList.add('ivy-fx'); },
+                (el) => { el.classList.remove('ivy-fx'); }
+            );
 
             // Base UI sounds
-            document.querySelectorAll('.base-target, .btn-lab').forEach(el => {
-                el.addEventListener('mouseenter', () => hoverSound('base'));
-            });
+            addTrigger(document.querySelectorAll('.base-target, .btn-lab'), () => hoverSound('base'));
         }
 
         // --- SYNTHESIZED AUDIO ENGINE ---
@@ -579,36 +595,12 @@
             } catch(e) {}
         }
 
-        // Joker Trigger Button (Start Menu)
         function scare() {
             const s = document.getElementById('joker-scare');
             const snd = document.getElementById('snd-joker');
-            if(snd) { snd.currentTime = 0; snd.play().catch(e => {}); }
+            if(snd) { snd.currentTime = 0; snd.volume = 0.1; snd.play().catch(e => {}); }
             s.style.display = 'block';
             setTimeout(() => s.style.display = 'none', 2500);
-        }
-
-        // Rain Generation
-        function startBackgroundEffects() {
-            const bg = document.getElementById('gotham-bg');
-            for(let i=0; i<70; i++) {
-                const r = document.createElement('div');
-                r.className = 'rain';
-                r.style.left = Math.random() * 100 + '%';
-                r.style.top = Math.random() * 100 + '%';
-                bg.appendChild(r);
-                animateRain(r);
-            }
-        }
-
-        function animateRain(el) {
-            let speed = 2 + Math.random() * 3;
-            function step() {
-                let top = parseFloat(el.style.top);
-                el.style.top = (top > 105 ? -10 : top + speed) + '%';
-                requestAnimationFrame(step);
-            }
-            step();
         }
     </script>
 </body>
