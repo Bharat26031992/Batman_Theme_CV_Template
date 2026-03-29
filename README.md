@@ -1,5 +1,7 @@
 # Batman Theme CV Template 🦇
 
+<img width="1837" height="770" alt="image" src="https://github.com/user-attachments/assets/1dcb9a15-2d96-4f96-b009-6d39b1af3243" />
+
 A dark, immersive CV template inspired by the Batman: The Animated Series aesthetic. This interactive web-based portfolio uses advanced CSS and JavaScript to create a Gotham City atmosphere with parallax effects, dynamic lighting, and atmospheric elements.
 
 ## Features
