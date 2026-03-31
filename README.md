@@ -131,12 +131,7 @@ This project is provided as-is for personal portfolio use.
 
 ## Author
 
-**Bharat Singh Rawat** - Dossier #26031992
-
-A creative showcase combining web development expertise with the iconic aesthetics of Batman: The Animated Series.
-
+**Dr.Bharat Singh Rawat** 
 ---
-
-**Built with:** HTML5, CSS3, JavaScript (ES6+), Web Audio API
 
 **Inspired by:** Batman: The Animated Series, Gotham City, Arkham Asylum
